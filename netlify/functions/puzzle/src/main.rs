@@ -51,7 +51,7 @@ pub(crate) async fn my_handler(_event: ApiGatewayProxyRequest, _ctx: Context) ->
     },
     "puzzle": puzzle,
     "ref": base64::encode(line),
-    "xid": "netlify"
+    "tag": "netlify"
   });
 
   let payload = serde_json::to_string(&data).unwrap();
