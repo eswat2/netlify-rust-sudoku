@@ -11,6 +11,8 @@ use simple_logger::SimpleLogger;
 use std::time::Instant;
 use sudoku::Sudoku;
 
+const PLATFORM: &str = "netlify";
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
   SimpleLogger::new().with_level(LevelFilter::Info).init().unwrap();
@@ -51,7 +53,7 @@ pub(crate) async fn my_handler(_event: ApiGatewayProxyRequest, _ctx: Context) ->
     },
     "puzzle": puzzle,
     "ref": base64::encode(line),
-    "tag": "netlify"
+    "tag": PLATFORM
   });
 
   let payload = serde_json::to_string(&data).unwrap();
