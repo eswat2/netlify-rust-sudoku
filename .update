@@ -1,7 +1,10 @@
 #!/bin/bash
+# ---------------------------------------------------------------------
+# NOTE:  using a json cache, created with nx, read with jj...
+
+CACHE=${HOME}/github/.wc-cache.json
 TARGET=`cat .target`
-LINE=`ack version ../../ionic/$TARGET/package.json`
-VERSION=`echo $LINE | sed 's/^.*[^0-9]\([0-9]*\.[0-9]*\.[0-9]*\).*$/\1/'`
+VERSION=`cat ${CACHE} | jj ${TARGET}`
 LAST=`cat .version`
 PREFIX="--"
 PROD="--- Production:"
