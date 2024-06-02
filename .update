@@ -8,7 +8,7 @@ VERSION=`cat ${CACHE} | jj ${TARGET}`
 LAST=`cat .version`
 PREFIX="--"
 PROD="--- Production:"
-APP="rust-sudoku-wc.netlify.app"
+APP="https://rust-sudoku-wc.netlify.app"
 
 bold=$(tput bold)
 normal=$(tput sgr0)
