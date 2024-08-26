@@ -10,6 +10,10 @@ PREFIX="--"
 PROD="--- Production:"
 APP="https://rust-sudoku-wc.netlify.app"
 
+RED="\033[31m"
+GREEN="\033[32m"
+RESET="\033[0m"
+
 bold=$(tput bold)
 normal=$(tput sgr0)
 
@@ -17,10 +21,10 @@ if [ "$VERSION" = "$LAST" ];
 then
   if [ $# == 0 ]
   then
-    printf "%s skip... [ %s ] \n" $PREFIX $VERSION
+    printf "%s skip... [ ${GREEN}%s${RESET} ] \n" $PREFIX $VERSION
   fi
 else
-  printf "%s %s \n" $PREFIX $VERSION
+  printf "%s ${GREEN}%s${RESET} \n" $PREFIX $VERSION
   echo $VERSION > .version
   sed "s/VERSION/$VERSION/g" <.template.html >index.html
 
