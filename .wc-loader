@@ -1,0 +1,86 @@
+#!/bin/bash
+# ---------------------------------------------------------------------
+# NOTE:  using a json cache, created with nx, read with jj...
+TEMPLATE=.template.html
+PREFIX="--"
+
+CACHE=${HOME}/github/.wc-cache.json
+
+RED="\033[31m"
+GREEN="\033[32m"
+RESET="\033[0m"
+BOLD="\033[1m"
+
+fetchLatest () {
+  if [ $# == 1 ]
+  then
+    cat ${CACHE} | jj ${1}
+  fi
+}
+
+fetchTag () {
+  if [ $# == 2 ]
+  then
+    cat .wc-tags.json | jj ${1}.${2}
+  fi
+}
+
+genKeyz () {
+  jaq "keys[]" .wc-tags.json | tr -d '"'
+}
+
+genVerz () {
+  jaq ".[].version" .wc-tags.json | tr -d '"'
+}
+
+
+if [ -f ${TEMPLATE} ]
+then
+  KEYZ=`genKeyz`
+  VERZ=`genVerz`
+
+  BAK1=.bak1.html
+  BAK2=.bak2.html
+
+  MODZ=""
+
+  cp $TEMPLATE $BAK1
+
+  for key in $KEYZ; do
+    LATEST=`fetchLatest $key`
+    TAG=`fetchTag $key tag`
+    VERSION=`fetchTag $key version`
+    # printf "%s %s %s %s ... %s \n" "--" $key $TAG $VERSION $LATEST
+
+    if [ "$VERSION" != "$LATEST" ]
+    then
+      printf "%s %24s  ${GREEN}%s${RESET} \n" $PREFIX $key $LATEST
+
+      cat .wc-tags.json | jj -v $LATEST $key.version > .tmp.json
+      cat .tmp.json > .wc-tags.json
+
+      MODZ="$LATEST $MODZ"
+    fi
+
+    sed "s/$TAG/$LATEST/g" <$BAK1 > $BAK2
+    cp $BAK2 $BAK1
+  done
+
+  cp $BAK2 index.html
+  rm $BAK1 $BAK2
+  [ -f .tmp.json ] && rm .tmp.json
+
+  COUNT=`echo $VERZ | wc -w`
+  printf "%s\n" $COUNT > .tags
+
+  if [ "$MODZ" != "" ]
+  then
+    git commit -a -m "bump $MODZ"
+    git push
+  else
+    SKIP=true
+    # printf "%s skip... [ ${GREEN}%s${RESET} ] \n" $PREFIX "$IDZ"
+  fi
+else
+  printf "%s missing template... [ ${RED}%s${RESET} ] \n" $PREFIX $TEMPLATE
+fi

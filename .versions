@@ -1,0 +1,67 @@
+#!/bin/bash
+# ---------------------------------------------------------------------
+# NOTE:  using a json cache, created with nx, read with jj...
+
+CACHE=.wc-tags.json
+LOADER="-- :loader"
+PREFIX="--"
+
+RED="\033[31m"
+GREEN="\033[32m"
+BLUE="\033[94m"
+STOP="\033[0m"
+CHECK="\xE2\x9C\x94"
+
+OK="${GREEN}${CHECK}${STOP}"
+XLDR="${BLUE}${LOADER}${STOP}"
+
+fetchKey () {
+  if [ $# == 1 ]
+  then
+    cat ${CACHE} | jj ${1}
+  fi
+}
+
+fetchLatest () {
+  if [ $# == 1 ]
+  then
+    cat ${HOME}/github/.wc-cache.json | jj ${1}
+  fi
+}
+
+if [ -f ${CACHE} ]
+then
+  # IMPORTANT:  strip the double quotes from all the keys...
+  KEYS=`jaq "keys[]" ${CACHE} | tr -d '"'`
+
+  echo "------------------------------------------ netlify-rust-sudoku "
+  echo "--"
+
+  for key in ${KEYS}; do
+    VALUE=`fetchKey ${key}.version`
+    LATEST=`fetchLatest ${key}`
+    TAG=""
+    if [ "$#" == "1" ]
+    then
+      [ "$1" == "42" ] && TAG=`fetchKey ${key}.tag`
+    fi
+    if [ $VALUE == $LATEST ]
+    then
+      if [ "${key}" == "proto-ikon-loader-wc" ]
+      then
+        if [ "${TAG}" == "" ]
+        then
+          printf "%s %24s  ${GREEN}%s ${CHECK}${STOP} ${XLDR} \n" ${PREFIX} ${key} ${VALUE}
+        else
+          printf "%s %24s  ${GREEN}%s ${CHECK}${STOP} ${BLUE}%s${STOP} ${XLDR} \n" ${PREFIX} ${key} ${VALUE} ${TAG}
+        fi
+      else
+        printf "%s %24s  %s ${OK} ${BLUE}%s${STOP} \n" ${PREFIX} ${key} ${VALUE} ${TAG}
+      fi
+    else
+      printf "%s %24s  ${RED}%s - %s${STOP} \n" ${PREFIX} ${key} ${LATEST} ${TAG}
+    fi
+  done
+
+  echo "--"
+fi
