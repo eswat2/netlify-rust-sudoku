@@ -5,6 +5,7 @@ TEMPLATE=.template.html
 PREFIX="--"
 
 CACHE=${HOME}/github/.wc-cache.json
+CDN2=cdn.jsdelivr.net\\/npm
 
 RED="\033[31m"
 GREEN="\033[32m"
@@ -65,6 +66,8 @@ then
     sed "s/$TAG/$LATEST/g" <$BAK1 > $BAK2
     cp $BAK2 $BAK1
   done
+
+  sed "s/_CDN/$CDN2/g" <$BAK1 > $BAK2
 
   cp $BAK2 index.html
   rm $BAK1 $BAK2
