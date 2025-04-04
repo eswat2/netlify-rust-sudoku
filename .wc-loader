@@ -5,7 +5,6 @@ TEMPLATE=.template.html
 PREFIX="--"
 
 CACHE=${HOME}/github/.wc-cache.json
-CDN2=cdn.jsdelivr.net\\/npm
 
 RED="\033[31m"
 GREEN="\033[32m"
@@ -67,7 +66,8 @@ then
     cp $BAK2 $BAK1
   done
 
-  sed "s/_CDN/$CDN2/g" <$BAK1 > $BAK2
+  # NOTE:  new utility to do the _CDN substitution...
+  subCDN $BAK1 > $BAK2
 
   cp $BAK2 index.html
   rm $BAK1 $BAK2
